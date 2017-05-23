@@ -4,156 +4,242 @@ import random
 import BW3
 import time
 
-root = Tk()  # Defining root for the rest of the program
 
-# **********************************************************************************************************************
-# Game Setup
+class App():
 
 
-gameC = tk.Canvas(root,width=500, height=506)  # This creates the game canvas so that images can be used in the GUI
-gameC.pack(pady=10, padx=10)  # This puts a padding around the canvas so hat there is a border
-gameC.config(bg="black")  # This changes the background colour to black so that the main image had a black border
-board = tk.PhotoImage(file="monopoly-board.png")  # This tells the program what the file is (in the same folder)
-board_img = gameC.create_image(252,255,image=board)  # This creates the image on the screen
-redDot = tk.PhotoImage(file="red-dot.png")  # This imports the file for the red counter
-P1 = gameC.create_image(450,490,image=redDot)  # This puts the image on the screen over GO
-blueDot = tk.PhotoImage(file="blue-dot.png")  # This imports the file for the blue counter
-Cpu = gameC.create_image(485,455,image=blueDot)  # This puts the blue counter image on the screen over GO
-displayBox = Text(root)  # This creates the display box with the text
-displayBox.pack(padx = 10)  # This adds a padding around the text boc so that it has a border
-displayBox.insert(END,">>> Monopoly Game \n\n")  # This inputs on the first line so they know what the game is
-displayBox.insert(END,"Welcome to Monopoly.")  # This introduces them to the game and then prompts them to pick a player mode
-positionP1 = 0  # This creates the variable for position of the players
-positionCpu = 0  # This creates
-
-# **********************************************************************************************************************
-# One player Function
+    def __init__(self):
 
 
-def onePlayer():
-    displayBox.insert(END,"You will be the red counter. The computer will be the blue  counter\n")
-    #  Tells the user what counter they have been given
+        self.root = Tk()  # Defining root for the rest of the program
 
-    displayBox.insert(END, "\nYou will now roll to start\n"
-                           "Player one press r to roll\n\n")
+        # **********************************************************************************************************************
+        # Game Setup
 
-# **********************************************************************************************************************
-# Roll Player One Function
+        self.moneyP1 = 1500
+        self.gameC = tk.Canvas(self.root,width=500, height=506)  # This creates the game canvas so that images can be used in the GUI
+        self.gameC.grid(column=1,row=0)  # This puts a padding around the canvas so hat there is a border
+        self.gameC.config(bg="black")  # This changes the background colour to black so that the main image had a black border
+        self.board = tk.PhotoImage(file="monopoly-board.png")  # This tells the program what the file is (in the same folder)
+        self.board_img = self.gameC.create_image(252,255,image=self.board)  # This creates the image on the screen
+        self.redDot = tk.PhotoImage(file="red-dot.png")  # This imports the file for the red counter
+        self.P1 = self.gameC.create_image(450,490,image=self.redDot)  # This puts the image on the screen over GO
+        self.blueDot = tk.PhotoImage(file="blue-dot.png")  # This imports the file for the blue counter
+        self.Cpu = self.gameC.create_image(485,455,image=self.blueDot)  # This puts the blue counter image on the screen over GO
+        self.displayBox = Text(self.root)  # This creates the display box with the text
+        self.displayBox.grid(column=1,row=2)  # This adds a padding around the text boc so that it has a border
 
-
-def rollP1(*args):
-
-    root.bind("<y>",buy)
-
-
-    global P1
-    global positionP1
-
-    dice1P1 = random.randint(1,6)
-    dice2P1= random.randint(1,6)
-    diceTotalP1 = dice1P1 + dice2P1
-    positionP1 += diceTotalP1
-    if positionP1 >= 40:
-        positionP1 += -40
-
-    displayBox.insert(END,"You rolled an " + str(diceTotalP1))
-    if diceTotalP1 >= 10:
-        displayBox.insert(END, "!\n\n")
-    else:
-        displayBox.insert(END, "\n\n")
-
-    fileInP1Pos = open("positions.txt", "r")
-    contentP1Pos = fileInP1Pos.read()  # Gets the entire file including \n and stores it as
-    listP1Pos = BW3.generateList(contentP1Pos)
-
-    movePositionP1 = listP1Pos[positionP1]
-    listP1x = movePositionP1.split(",")
-    xp1 = int(listP1x[0])
-    yp1 = int(listP1x[1])
-
-    gameC.delete(P1)
-    P1 = gameC.create_image(xp1, yp1, image=redDot)
-
-    fileInP1Name = open("names.txt", "r")
-    contentP1Name = fileInP1Name.read()
-    listP1Name = BW3.generateList(contentP1Name)
-    print(listP1Name)
-
-    fileInP1Money = open("cost.txt", "r")
-    contentP1Money = fileInP1Money.read()
-    listP1Money = BW3.generateList(contentP1Money)
-    print(listP1Money)
-
-    if listP1Name[positionP1] == "Chance":
-        displayBox.insert(END,"You Landed on Chance")
-
-    elif listP1Name[positionP1] == "Community Chest":
-        displayBox.insert(END,"You Landed on Community Chest")
-
-    elif listP1Name[positionP1] == "Jail/Visiting":
-        displayBox.insert(END,"You are just passing through Jail")
-
-    elif listP1Name[positionP1] == "Free Parking":
-        displayBox.insert(END,"You are in free parking")
-
-    elif listP1Name[positionP1] == "Go to Jail":
-        displayBox.insert(END,"You will now go to Jail")
-
-    else:
-        displayBox.insert(END,"Would you like to buy the property " + listP1Name[positionP1] + " it will cost " + listP1Money[positionP1] +"$")
-
-# **********************************************************************************************************************
-#  Buy Function
-
-    def buy(*args):
-
-        displayBox.insert(END, "You Purchase " + movePositionP1 + " for " + listP1Money[positionP1])
-
-# **********************************************************************************************************************
-# Roll CPU Function
-
-def rollCpu():
-
-    global Cpu
-    global positionCpu
-
-    displayBox.insert(END,"The comuter will now roll!")
-
-    dice1Cpu = random.randint(1,6)
-    dice2Cpu = random.randint(1,6)
-    diceTotalCpu = dice1Cpu + dice2Cpu
-    positionCpu += diceTotalCpu
-    if positionCpu >= 40:
-        positionCpu += -40
-
-    displayBox.insert(END,"The computer rolled a " + str(diceTotalCpu))
-    if diceTotalCpu >= 10:
-        displayBox.insert(END,"!\n\n")
-    else:
-        displayBox.insert(END,"\n\n")
-
-    fileInCpu = open("positions.txt","r")
-    contentCpu = fileInCpu.read()
-    listCPu = BW3.generateList(contentCpu)
-
-    movePositionCpu = listCPu[positionCpu]
-
-    if movePositionCpu == "465,40":
-        movePositionCpu = "40,465"
+        self.displayBox.insert(END,"What is your name?\n Press ALt Left\n\n")
+        self.name = Entry(self.root)
+        self.name.grid(column=0, row=3)
 
 
-    listCPux = movePositionCpu.split(",")
-    xCpu = int(listCPux[0])
-    yCpu = int(listCPux[1])
-
-    gameC.delete(Cpu)
-    Cpu = gameC.create_image(xCpu,yCpu, image=blueDot)
+        self.root.bind("<Alt_L  >",self.nameRun)
 
 
-#***********************************************************************************************************************
+        self.moneyBoxLP1 = Label(self.root, text="P1 Money")  # Creates the label for P1 money
+        self.moneyBoxLP1.grid(column=0, row=0, columnspan=1)  # Applies the label to the grid
+        self.moneyBoxMP1 = Label(self.root, text=str(self.moneyP1))  # Creates the label for the money factor
+        self.moneyBoxMP1.grid(column=0, row=1, columnspan=1)  # Applies the label to the grid
+        self.moneyBoxLCpu = Label(self.root, text="Cpu Money")  # Creates the label for CPU Money
+        self.moneyBoxLCpu.grid(column=3, row=0, columnspan=1)  # Applies the lablel to the grid
+        self.moneyBoxMCpu = Label(self.root, text=str(self.moneyP1))  # Creates the label for the money factor
+        self.moneyBoxMCpu.grid(column=3, row=1, columnspan=1)  # Applies the label to the grid
+        self.root.title("Monopoly Game")
 
-root.bind("<r>", rollP1)  # This binds the key R to the roll function
+        self.root.mainloop()
 
-onePlayer()  # Calls the one player function
+    def nameRun(self,*args):
 
-root.mainloop()
+
+        self.nameVal = self.name.get()
+
+
+        self.fileIn = open("names.txt", "w")
+        self.fileIn.write(self.nameVal)
+
+        self.name.destroy()
+
+        self.displayBox.insert(END,"Welcome to Monopoly " + self.nameVal + ".")  # This introduces them to the game and then prompts them to pick a player mode
+        self.positionP1 = 0  # This creates the variable for position of the players
+        self.positionCpu = 0  # This creates the variable for position of the CPU
+
+        self.root.bind("<r>", self.rollP1)  # This binds the key R to the roll function
+
+        self.onePlayer()  # Calls the one player function
+
+
+    # **********************************************************************************************************************
+    # One player Function
+
+
+    def onePlayer(self):
+        self.displayBox.insert(END," You will be the red counter. The computer will be the  blue counter\n")
+        #  Tells the user what counter they have been given
+
+        self.displayBox.insert(END, "\nYou will now roll to start\n"
+                                    "Player one press r to roll\n\n")
+        # Tells the user what they will have to do to roll the dice
+
+    # **********************************************************************************************************************
+    # Roll Player One Function
+
+
+    def rollP1(self,*args):
+
+
+        global eBox
+        global P1
+        global positionP1
+        global listP1Name
+        global moneyP1
+
+        self.moneyP1 = 1500
+
+        self.dice1P1 = random.randint(1,6)
+        self.dice2P1= random.randint(1,6)
+        self.diceTotalP1 = self.dice1P1 + self.dice2P1
+        self.positionP1 += self.diceTotalP1
+        if self.positionP1 >= 40:
+            self.positionP1 += -40
+
+        self.displayBox.insert(END,"You rolled an " + str(self.diceTotalP1))
+        if self.diceTotalP1 >= 10:
+           self. displayBox.insert(END, "!\n\n")
+        else:
+            self.displayBox.insert(END, "\n\n")
+
+        self.fileInP1Pos = open("positions.txt", "r")
+        self.contentP1Pos = self.fileInP1Pos.read()  # Gets the entire file including \n and stores it as
+        self.listP1Pos = BW3.generateList(self.contentP1Pos)
+
+        self.movePositionP1 = self.listP1Pos[self.positionP1]
+        self.listP1x = self.movePositionP1.split(",")
+        self.xp1 = int(self.listP1x[0])
+        self.yp1 = int(self.listP1x[1])
+
+        self.gameC.delete(self.P1)
+        self.P1 = self.gameC.create_image(self.xp1, self.yp1, image=self.redDot)
+
+        self.fileInP1Name = open("names.txt", "r")
+        self.contentP1Name = self.fileInP1Name.read()
+        self.listP1Name = BW3.generateList(self.contentP1Name)
+
+
+        self.fileInP1Money = open("cost.txt", "r")
+        self.contentP1Money = self.fileInP1Money.read()
+        self.listP1Money = BW3.generateList(self.contentP1Money)
+
+        if self.listP1Name[self.positionP1] == "Chance":
+            self.displayBox.insert(END,"You Landed on Chance\n\n")
+            rollCPu()
+
+        elif self.listP1Name[self.positionP1] == "Community Chest":
+            self.displayBox.insert(END,"You Landed on Community Chest\n\n")
+            rollCPu()
+
+        elif self.listP1Name[self.positionP1] == "Jail/Visiting":
+            self.displayBox.insert(END,"You are just passing through Jail\n\n")
+            rollCPu()
+
+        elif self.listP1Name[self.positionP1] == "Free Parking":
+           self. displayBox.insert(END,"You are in free parking\n\n")
+           rollCPu()
+
+        elif self.listP1Name[self.positionP1] == "Go to Jail":
+            self.displayBox.insert(END,"You will now go to Jail\n\n")
+            rollCPu()
+
+        elif self.listP1Name[self.positionP1] == "Income Tax":
+            self.displayBox.insert(END,"You Landed on income tax. You will be charged $200\n\n")
+            self.moneyP1 += -200
+
+            print(self.moneyP1)
+            rollCPu()
+
+        else:
+            self.displayBox.insert(END,"Would you like to buy the property " + self.listP1Name[self.positionP1] + " it will cost " + self.listP1Money[self.positionP1] +"$\n\n")
+
+            self.eBox = Entry(self.root)
+            self.eBox.grid(column=1,row=3)
+
+
+        def eBoxValRun(*args):
+
+            self.eBoxVal = self.eBox.get()
+
+            if self.eBoxVal == "Yes":
+
+                self.purchasedFile = open("purchasedFile.txt","a")
+
+                self.purchasedFile.write(self.listP1Name[self.positionP1]+"Purchased:")
+
+                buy()
+
+            elif self.eBoxVal == "No":
+
+                self.displayBox.insert(END,"You don't buy the property")
+
+
+
+            self.eBox.destroy()
+
+            rollCpu()
+
+        self.root.bind("<Return>", eBoxValRun)
+
+
+
+
+
+    # **********************************************************************************************************************
+    #  Buy Function
+
+    def buy(self,*args):
+
+        self.displayBox.insert(END, "You Purchase " + self.movePositionP1 + " for " + self.listP1Money[self.positionP1])
+
+    # **********************************************************************************************************************
+    # Roll CPU Function
+
+    def rollCpu(self):
+
+        global Cpu
+        global positionCpu
+
+        self.displayBox.insert(END,"The comuter will now roll!")
+
+        self.dice1Cpu = random.randint(1,6)
+        self.dice2Cpu = random.randint(1,6)
+        self.diceTotalCpu = self.dice1Cpu + self.dice2Cpu
+        self.positionCpu += self.diceTotalCpu
+        if self.positionCpu >= 40:
+            self.positionCpu += -40
+
+        self.displayBox.insert(END,"The computer rolled a " + str(self.diceTotalCpu))
+        if self.diceTotalCpu >= 10:
+            self.displayBox.insert(END,"!\n\n")
+        else:
+            self.displayBox.insert(END,"\n\n")
+
+        self.fileInCpu = open("positions.txt","r")
+        self.contentCpu = self.fileInCpu.read()
+        self.listCPu = BW3.generateList(self.contentCpu)
+
+        self.movePositionCpu = self.listCPu[self.positionCpu]
+
+        if self.movePositionCpu == "465,40":
+            self.movePositionCpu = "40,465"
+
+
+        self.listCPux = self.movePositionCpu.split(",")
+        self.xCpu = int(self.listCPux[0])
+        self.yCpu = int(self.listCPux[1])
+
+        self.gameC.delete(Cpu)
+        self.Cpu = gameC.create_image(xCpu,yCpu, image=blueDot)
+
+
+    # **********************************************************************************************************************
+
+app = App()
