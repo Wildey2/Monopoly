@@ -54,9 +54,11 @@ class App():
 
         self.nameVal = self.name.get()
 
+        self.called = self.nameVal
 
-        self.fileIn = open("names.txt", "w")
-        self.fileIn.write(self.nameVal)
+
+        self.fileIn = open("playernames.txt", "w")
+        self.fileIn.write(self.called)
 
         self.name.destroy()
 
@@ -69,7 +71,7 @@ class App():
         self.onePlayer()  # Calls the one player function
 
 
-    # **********************************************************************************************************************
+    # *********************************************************************************************************************
     # One player Function
 
 
@@ -86,13 +88,6 @@ class App():
 
 
     def rollP1(self,*args):
-
-
-        global eBox
-        global P1
-        global positionP1
-        global listP1Name
-        global moneyP1
 
         self.moneyP1 = 1500
 
@@ -130,6 +125,9 @@ class App():
         self.contentP1Money = self.fileInP1Money.read()
         self.listP1Money = BW3.generateList(self.contentP1Money)
 
+        print(self.positionP1)
+        print(self.listP1Name)
+
         if self.listP1Name[self.positionP1] == "Chance":
             self.displayBox.insert(END,"You Landed on Chance\n\n")
             rollCPu()
@@ -163,35 +161,29 @@ class App():
             self.eBox = Entry(self.root)
             self.eBox.grid(column=1,row=3)
 
-
-        def eBoxValRun(*args):
-
-            self.eBoxVal = self.eBox.get()
-
-            if self.eBoxVal == "Yes":
-
-                self.purchasedFile = open("purchasedFile.txt","a")
-
-                self.purchasedFile.write(self.listP1Name[self.positionP1]+"Purchased:")
-
-                buy()
-
-            elif self.eBoxVal == "No":
-
-                self.displayBox.insert(END,"You don't buy the property")
+            self.root.bind("<Return>", self.eBoxValRun)
 
 
+    def eBoxValRun(self,*args):
 
-            self.eBox.destroy()
+        self.eBoxVal = self.eBox.get()
 
-            rollCpu()
+        if self.eBoxVal == "Yes":
 
-        self.root.bind("<Return>", eBoxValRun)
+            self.purchasedFile = open("purchasedFile.txt","a")
+
+            self.purchasedFile.write(self.listP1Name[self.positionP1]+"Purchased:")
+
+            buy()
+
+        elif self.eBoxVal == "No":
+
+            self.displayBox.insert(END,"You don't buy the property")
 
 
+        self.eBox.destroy()
 
-
-
+        self.rollCpu()
     # **********************************************************************************************************************
     #  Buy Function
 
@@ -222,22 +214,24 @@ class App():
         else:
             self.displayBox.insert(END,"\n\n")
 
+
         self.fileInCpu = open("positions.txt","r")
         self.contentCpu = self.fileInCpu.read()
         self.listCPu = BW3.generateList(self.contentCpu)
+
 
         self.movePositionCpu = self.listCPu[self.positionCpu]
 
         if self.movePositionCpu == "465,40":
             self.movePositionCpu = "40,465"
 
-
+        self.movePositionCpu = self.listCPu[self.positionCpu]
         self.listCPux = self.movePositionCpu.split(",")
         self.xCpu = int(self.listCPux[0])
         self.yCpu = int(self.listCPux[1])
 
-        self.gameC.delete(Cpu)
-        self.Cpu = gameC.create_image(xCpu,yCpu, image=blueDot)
+        self.gameC.delete(self.Cpu)
+        self.P1 = self.gameC.create_image(self.xCpu, self.yCpu, image=self.blueDot)
 
 
     # **********************************************************************************************************************
