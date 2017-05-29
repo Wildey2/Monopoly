@@ -29,12 +29,12 @@ class App():
         self.displayBox = Text(self.root)  # This creates the display box with the text
         self.displayBox.grid(column=1,row=2)  # This adds a padding around the text boc so that it has a border
 
-        self.displayBox.insert(END,"What is your name?\n Press ALt Left\n\n")
+        self.displayBox.insert(END,"What is your name?\n Press Enter\n\n")
         self.name = Entry(self.root)
         self.name.grid(column=0, row=3)
 
 
-        self.root.bind("<Alt_L  >",self.nameRun)
+        self.root.bind("<Return>",self.nameRun)
 
 
         self.moneyBoxLP1 = Label(self.root, text="P1 Money")  # Creates the label for P1 money
@@ -52,15 +52,29 @@ class App():
     def nameRun(self,*args):
 
 
-        self.nameVal = self.name.get()
+        self.nameVal = self.name.get()  # Getting the input from the text box when the enter key is pressed
 
-        self.called = self.nameVal
+        self.called = self.nameVal  # storing the name value due to prior error
+
+        self.fileInP1Player = open("playernames.txt","r")  # Reading the player name into the player names file
+        self.contentP1Name = self.fileInP1Player
+        self.listP1Player = BW3.generateList(self.contentP1Name)
+
+        # Making an alredy played name check system
+
+        '''
+        self.p1Called = ""
+        self.ctr = 0
+        for i in range(len(self.listP1Player)):
+            if self.listP1Player ==
+        '''
 
 
-        self.fileIn = open("playernames.txt", "w")
-        self.fileIn.write(self.called)
 
-        self.name.destroy()
+        self.fileIn = open("playernames.txt", "a") # Writing the player name into the player names file
+        self.fileIn.write(self.called + ":")
+
+        self.name.destroy()  # Deleting the input box from the screen
 
         self.displayBox.insert(END,"Welcome to Monopoly " + self.nameVal + ".")  # This introduces them to the game and then prompts them to pick a player mode
         self.positionP1 = 0  # This creates the variable for position of the players
@@ -76,7 +90,7 @@ class App():
 
 
     def onePlayer(self):
-        self.displayBox.insert(END," You will be the red counter. The computer will be the  blue counter\n")
+        self.displayBox.insert(END," You will be the red counter. The computer will be the  blue counter\n")  # Introduces the player to the game
         #  Tells the user what counter they have been given
 
         self.displayBox.insert(END, "\nYou will now roll to start\n"
@@ -89,24 +103,24 @@ class App():
 
     def rollP1(self,*args):
 
-        self.moneyP1 = 1500
+        self.moneyP1 = 1500  # Sets player 1's money to the standard 1500
 
-        self.dice1P1 = random.randint(1,6)
+        self.dice1P1 = random.randint(1,6)  # This simulates a dice roll
         self.dice2P1= random.randint(1,6)
         self.diceTotalP1 = self.dice1P1 + self.dice2P1
         self.positionP1 += self.diceTotalP1
-        if self.positionP1 >= 40:
+        if self.positionP1 >= 40:  # Keeping the limit to 40 (the # of spaces on the board)
             self.positionP1 += -40
 
-        self.displayBox.insert(END,"You rolled an " + str(self.diceTotalP1))
+        self.displayBox.insert(END,"You rolled an " + str(self.diceTotalP1))  # Telling the player what they rolled
         if self.diceTotalP1 >= 10:
-           self. displayBox.insert(END, "!\n\n")
+           self. displayBox.insert(END, "!\n\n")  # If the player rolls higher than a 10 an ! mark gets put after the text
         else:
             self.displayBox.insert(END, "\n\n")
 
         self.fileInP1Pos = open("positions.txt", "r")
-        self.contentP1Pos = self.fileInP1Pos.read()  # Gets the entire file including \n and stores it as
-        self.listP1Pos = BW3.generateList(self.contentP1Pos)
+        self.contentP1Pos = self.fileInP1Pos.read()
+        self.listP1Pos = BW3.generateList(self.contentP1Pos)    # Reads from the positions file
 
         self.movePositionP1 = self.listP1Pos[self.positionP1]
         self.listP1x = self.movePositionP1.split(",")
@@ -114,19 +128,21 @@ class App():
         self.yp1 = int(self.listP1x[1])
 
         self.gameC.delete(self.P1)
-        self.P1 = self.gameC.create_image(self.xp1, self.yp1, image=self.redDot)
+        self.P1 = self.gameC.create_image(self.xp1, self.yp1, image=self.redDot)  # Inserts the possitions in as co-ordinates
 
-        self.fileInP1Name = open("names.txt", "r")
+        self.fileInP1Name = open("names.txt", "r")  # Reading from the place names file
         self.contentP1Name = self.fileInP1Name.read()
         self.listP1Name = BW3.generateList(self.contentP1Name)
 
 
-        self.fileInP1Money = open("cost.txt", "r")
+        self.fileInP1Money = open("cost.txt", "r")  # Reading from the cost file
         self.contentP1Money = self.fileInP1Money.read()
         self.listP1Money = BW3.generateList(self.contentP1Money)
 
-        print(self.positionP1)
+        print(self.positionP1)  # Printing the two positions to the console
         print(self.listP1Name)
+
+        # making all the exeptions for places which arent land
 
         if self.listP1Name[self.positionP1] == "Chance":
             self.displayBox.insert(END,"You Landed on Chance\n\n")
@@ -155,7 +171,12 @@ class App():
             print(self.moneyP1)
             rollCPu()
 
+        # Otherwise asking them if they would like to buy the property that they had landed on
+
         else:
+
+            # Impliment check to see if the place has already been purchased
+
             self.displayBox.insert(END,"Would you like to buy the property " + self.listP1Name[self.positionP1] + " it will cost " + self.listP1Money[self.positionP1] +"$\n\n")
 
             self.eBox = Entry(self.root)
@@ -165,6 +186,8 @@ class App():
 
 
     def eBoxValRun(self,*args):
+
+        # Buying the place for the user
 
         self.eBoxVal = self.eBox.get()
 
@@ -189,7 +212,9 @@ class App():
 
     def buy(self,*args):
 
-        self.displayBox.insert(END, "You Purchase " + self.movePositionP1 + " for " + self.listP1Money[self.positionP1])
+        # Telling them what they bought
+
+        self.displayBox.insert(END, "You Purchased " + self.movePositionP1 + " for " + self.listP1Money[self.positionP1])
 
     # **********************************************************************************************************************
     # Roll CPU Function
